@@ -10,7 +10,7 @@
       });
     },
 
-    addHook: function(hookName, object, handler) {
+    addHook: function(hookName, handler, object) {
       var hook = this.hooks[hookName] = this.hooks[hookName] || [];
       hook.push([object, handler]);
     },
@@ -30,14 +30,51 @@
     flickrPlugin.utils.extendWithHooks(this);
     this.currentPage = 0;
     this.totalPages = 0;
+    this.itemsPerPage = 6;
+    this.gridDomRooot = null;
+    this.imageDomRooot = null;
+    this.currentData = null;
+    this.apiKey = apiKey;
   };
 
   FlickrPlugin.prototype.setCurrentPage = function(pageNumber) {
 
   };
 
-  FlickrPlugin.prototype.populate = function(data) {
+  FlickrPlugin.prototype._setContent = function(data) {
+    this.setCurrentPage();
+  };
 
+  FlickrPlugin.prototype._populate = function(data) {
+    this.setCurrentPage();
+    // (format "http://farm%s.staticflickr.com/%s/%s_%s_z.jpg" farm server id secret)
+  };
+
+  FlickrPlugin.prototype.searchFlickr = function(searchString) {
+    var self = this;
+    var url = [
+      'http://api.flickr.com/services/rest/?format=json',
+      'sort=random',
+      'method=flickr.photos.search',
+      'tags=' + encodeURIComponent(searchString),
+      'tag_mode=all',
+      'per_page=' + this.itemsPerPage,
+      'api_key=' + this.apiKey,
+    ].join('&');
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+
+    xhr.onload = function() {
+      var json = JSON.parse(
+        xhr.responseText
+          .replace(/^[^\(]+\(/, '')
+          .replace(/\)[^\)]*$/, '')
+      );
+      self._populate(json);
+    };
+
+    xhr.send();
   };
 
   // ---------------------------------------------------------------------------
@@ -46,17 +83,21 @@
     // FIXME?: Change to "pageable"
     domElement, flickrPlugin
   ) {
-    flickrPlugin.addHook('totalPagesChanged', this, this.setTotalPages);
-    flickrPlugin.addHook('currentPageChanged', this, this.setTotalPages);
+    flickrPlugin.addHook('totalPagesChanged', this.setTotalPages, this);
+    flickrPlugin.addHook('currentPageChanged', this.setTotalPages, this);
+  };
+
+  FlickrPluginPager.prototype.setCurrentPage = function(pageNumber) {
+    this.pageNumber = pageNumber;
+  };
+
+  FlickrPluginPager.prototype.setTotalPages = function(pageNumber) {
 
   };
 
-  FlickrPluginPager.setCurrentPage = function(pageNumber) {
+  FlickrPluginPager.prototype.setTotalPages = function(pageNumber) {
 
   };
 
-  FlickrPluginPager.setTotalPages = function(pageNumber) {
-
-  };
-
+  window.flickrPlugin = flickrPlugin;
 }());
