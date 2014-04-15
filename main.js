@@ -24,33 +24,84 @@
 
   // ---------------------------------------------------------------------------
 
-  var FlickrPlugin = flickrPlugin.FlickrPlugin = function(
-    domElement, apiKey
+  var FlickrImageModel = flickrPlugin.FlickrImageModel = function(
+    data
+  ) {
+    this.data = data;
+  };
+
+  FlickrImageModel.prototype.getThumbnail = function(pageNumber) {
+  };
+
+  FlickrImageModel.prototype.getId = function() {
+    return this.data.id;
+  };
+
+  FlickrImageModel.prototype.getImage = function(pageNumber) {
+    var d = this.data;
+    // (format "http://farm%s.staticflickr.com/%s/%s_%s_z.jpg" farm server id secret)
+    return "http://farm" + d.farm + ".staticflickr.com/" +
+      d.server + "/" +
+      d.id + "_" +
+      d.secret + "_z.jpg";
+  };
+
+  // ---------------------------------------------------------------------------
+
+  var FlickrPluginModel = flickrPlugin.FlickrPluginModel = function(
+    apiKey
   ) {
     flickrPlugin.utils.extendWithHooks(this);
     this.currentPage = 0;
     this.totalPages = 0;
     this.itemsPerPage = 6;
-    this.gridDomRooot = null;
-    this.imageDomRooot = null;
-    this.currentData = null;
+    this.images = [];
+    this.lastSeachString = null;
     this.apiKey = apiKey;
+    this.currentImage = null;
+    this.currentPage = 0;
   };
 
-  FlickrPlugin.prototype.setCurrentPage = function(pageNumber) {
-
+  FlickrPluginModel.prototype.getImage = function(imageId) {
+    var result,
+        found = this.images.some(function(image) {
+          return (result = image.getId() == imageId);
+        });
+    if (found) {
+      return result;
+    }
   };
 
-  FlickrPlugin.prototype._setContent = function(data) {
-    this.setCurrentPage();
+  FlickrPluginModel.prototype.setCurrentImage = function(imageId) {
+    var image = this.getImage(imageId);
+    if ( ! image) {
+      return;
+    }
+    this.runHook('currentImageChanged', image);
   };
 
-  FlickrPlugin.prototype._populate = function(data) {
-    this.setCurrentPage();
-    // (format "http://farm%s.staticflickr.com/%s/%s_%s_z.jpg" farm server id secret)
+  FlickrPluginModel.prototype.setCurrentPage = function(pageNumber) {
+    this.currentPage = pageNumber;
+    if (this.lastSeachString) {
+      this.search();
+    }
   };
 
-  FlickrPlugin.prototype.searchFlickr = function(searchString) {
+  FlickrPluginModel.prototype._populate = function(data) {
+    this.images = data.photo.map(function(imageData) {
+      return new flickrPlugin.FlickrImageModel(
+        imageData
+      );
+    });
+  };
+
+  FlickrPluginModel.prototype.search = function(searchString) {
+    searchString = searchString || this.lastSeachString;
+    if (searchString !== this.lastSeachString) {
+      this.currentPage = 0;
+    }
+
+    // FIXME: Add currentPage
     var self = this;
     var url = [
       'http://api.flickr.com/services/rest/?format=json',
@@ -75,16 +126,44 @@
     };
 
     xhr.send();
+    this.lastSeachString = searchString;
+  };
+
+  // ---------------------------------------------------------------------------
+
+  var FlickrPlugin = flickrPlugin.FlickrPlugin = function(
+    domElement, apiKey
+  ) {
+    flickrPlugin.utils.extendWithHooks(this);
+    this.currentPage = 0;
+    this.totalPages = 0;
+    this.itemsPerPage = 6;
+    this.gridDomRooot = null;
+    this.imageDomRooot = null;
+    this.currentData = null;
+    this.apiKey = apiKey;
+  };
+
+  FlickrPlugin.prototype._setContent = function(data) {
+    this.setCurrentPage();
+  };
+
+  FlickrPlugin.prototype._populate = function(data) {
+    this.setCurrentPage();
   };
 
   // ---------------------------------------------------------------------------
 
   var FlickrPluginPager = flickrPlugin.FlickrPluginPager = function(
     // FIXME?: Change to "pageable"
-    domElement, flickrPlugin
+    domElement, model
   ) {
     flickrPlugin.addHook('totalPagesChanged', this.setTotalPages, this);
     flickrPlugin.addHook('currentPageChanged', this.setTotalPages, this);
+  };
+
+  FlickrPluginPager.prototype.render = function() {
+    // this.model.currentPage;
   };
 
   FlickrPluginPager.prototype.setCurrentPage = function(pageNumber) {
