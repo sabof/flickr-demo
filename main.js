@@ -54,7 +54,7 @@
     return "http://farm" + d.farm + ".staticflickr.com/" +
       d.server + "/" +
       d.id + "_" +
-      d.secret + "_s.jpg";
+      d.secret + "_q.jpg";
   };
 
   // ---------------------------------------------------------------------------
@@ -325,6 +325,10 @@
       image.src = imageObject.getThumbnail();
 
       root.appendChild(imageContainer);
+
+      root.appendChild(
+        document.createTextNode(' ')
+      );
     });
   };
 

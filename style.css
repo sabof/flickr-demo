@@ -1,18 +1,29 @@
 html {
 	background: #3C3B37;
 	font-family: arial, sans-serif;
+	color: white;
 }
 
 body {
 	background: #050B14;
+	margin-bottom: 150px;
+	padding-bottom: 50px;
 }
 
 a {
 	text-decoration: none;
+	color: white;
 }
 
 a:hover {
 	text-decoration: underline;
+}
+
+h1 {
+	color: #E5BC39;
+	font-size: 60px;
+	font-weight: bold;
+	font-family: georgia, times, serif;
 }
 
 #flickr-thumbnail-grid div {
@@ -30,16 +41,14 @@ a:hover {
 }
 
 .container {
-	width: 1028px;
+	width: 910px;
+	padding: 0 60px 0;
 	margin: auto;
+	overflow: hidden;
 }
 
 .share-button {
 	background: #54080F;
-}
-
-#flickr-thumbnail-grid {
-	margin-right: -20px;
 }
 
 #flickr-thumbnail-grid img {
@@ -50,7 +59,7 @@ a:hover {
 	padding: 1px;
 	display: block;
 	/* FIXME: Justify instead */
-	margin: 0 20px 20px 0;
+	/* margin: 0 20px 20px 0; */
 }
 
 #flickr-thumbnail-grid a:hover,
@@ -60,13 +69,46 @@ a:hover {
 }
 
 hr {
-	height: 4px;
+	border-width: 0 0 4px 0;
+	border-color: white;
+	border-style: solid;
+}
+
+#flickr-main-image {
+	height: 500px;
 }
 
 #flickr-main-image img {
 	margin: 0 auto;
+	max-height: 100%;
 }
 
 #flickr-main-image {
 	text-align: center;
+}
+
+#flickr-thumbnail-grid {
+	text-align: justify;
+	text-align-last: justify;
+}
+
+#flickr-thumbnail-grid:after {
+	content: "";
+	display: inline-block;
+	width: 100%;
+}
+
+#flickr-search {
+	margin: 20px 0;
+	float: right;
+}
+
+.maroon-background {
+	background: #650700;
+	height: 270px;
+	margin-bottom: -270px;
+}
+
+#flickr-pager {
+	text-align: right;
 }
