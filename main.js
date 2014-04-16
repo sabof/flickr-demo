@@ -24,6 +24,23 @@
       while (domElement.firstChild) {
         domElement.removeChild(domElement.firstChild);
       }
+    },
+
+    preloadImages: function(images, callback) {
+      var counter = images.length;
+
+      function onComplete() {
+        if ( ! --counter ) {
+          callback();
+        }
+      }
+
+      images.forEach(function(url) {
+        var imgObj = new Image();
+        imgObj.onload = onComplete;
+        imgObj.onerror = onComplete;
+        imgObj.src = url;
+      });
     }
   };
 
@@ -308,25 +325,38 @@
     domElement, model
   ) {
     this.model = model;
-    model.addHook('currentPageChanged', this._render, this);
-    model.addHook('currentImageChanged', this._render, this);
+    model.addHook('currentPageChanged', this._scheduleRender, this);
+    model.addHook('currentImageChanged', this._changeCurrent, this);
     this.domRoot = domElement;
     this.model = model;
   };
 
   FlickrPluginGridView.prototype._changeCurrent = function(image) {
     var id = image.getId();
-    Array.prototype.forEach.apply(
+    Array.prototype.forEach.call(
       this.domRoot.querySelectorAll('.current'),
       function(domElement) {
-        domElement.classList.remove('.current');
+        domElement.classList.remove('current');
       }
     );
-    this.domRoot.querySelector('*[data-id=' + id + ']')
-      .classList.remove('current');
+
+    var elem = this.domRoot.querySelector('[data-id="' + id + '"]');
+    if (elem) {
+      elem.parentElement.classList.add('current');
+    }
+  };
+
+  FlickrPluginGridView.prototype._scheduleRender = function() {
+    utils.preloadImages(
+      this.model.getImages().map(function(obj) {
+        return obj.getThumbnail();
+      }),
+      this._render.bind(this)
+    );
   };
 
   FlickrPluginGridView.prototype._render = function() {
+    console.log('gridRender');
     var images = this.model.getImages();
     var root = this.domRoot;
     utils.removeAllChildren(root);
@@ -390,7 +420,6 @@
   };
 
  FlickrImageView.prototype._render = function() {
-   console.log('main_imageRender');
    var root = this.domRoot;
    utils.removeAllChildren(root);
 
