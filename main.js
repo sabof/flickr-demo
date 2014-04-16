@@ -281,6 +281,18 @@
     this.model = model;
   };
 
+  FlickrPluginGridView.prototype._changeCurrent = function(image) {
+    var id = image.getId();
+    Array.prototype.forEach.apply(
+      this.domRoot.querySelectorAll('.current'),
+      function(domElement) {
+        domElement.classList.remove('.current');
+      }
+    );
+    this.domRoot.querySelector('*[data-id=' + id + ']')
+      .classList.remove('current');
+  };
+
   FlickrPluginGridView.prototype._render = function() {
     var images = this.model.getImages();
     var root = this.domRoot;
@@ -296,7 +308,9 @@
       var id = imageObject.getId();
 
       imageLink.href = '#';
+      imageLink.setAttribute('data-id', id);
 
+      // FIXME: Move outside
       (function(id) {
         imageLink.onclick = function() {
           self.model.setCurrentImage(id);
@@ -314,39 +328,52 @@
     });
   };
 
+
   // ---------------------------------------------------------------------------
 
   var FlickrImageView = function(
     domElement, model
   ) {
     this.model = model;
-    model.addHook('currentImageChanged', this._render, this);
+    model.addHook('currentImageChanged', this._scheduleRender, this);
     this.domRoot = domElement;
     this.model = model;
   };
 
-  FlickrImageView.prototype._render = function() {
-    console.log('main_imageRender');
-    var root = this.domRoot;
-    utils.removeAllChildren(root);
+  FlickrImageView.prototype._scheduleRender = function() {
+    var img = new Image();
+    var self = this;
+    img.onload = function() {
+      self._render();
+    };
 
-    var image = document.createElement('img');
-    root.appendChild(image);
-    image.src = this.model
+    img.src = this.model
       .getCurrentImage()
       .getImage();
-
   };
 
-  // ---------------------------------------------------------------------------
+ FlickrImageView.prototype._render = function() {
+   console.log('main_imageRender');
+   var root = this.domRoot;
+   utils.removeAllChildren(root);
 
-  var FlickrSearchView = function(
-    domElement, model
-  ) {
-    this.domRoot = domElement;
-    this.model = model;
-    domElement.onchange = function() {
-      console.log('search ran');
+   var image = document.createElement('img');
+   root.appendChild(image);
+   image.src = this.model
+     .getCurrentImage()
+     .getImage();
+
+ };
+
+ // ---------------------------------------------------------------------------
+
+ var FlickrSearchView = function(
+   domElement, model
+ ) {
+   this.domRoot = domElement;
+   this.model = model;
+   domElement.onchange = function() {
+     console.log('search ran');
       model.search(this.value);
     };
   };

@@ -49,14 +49,24 @@ a:hover {
 #flickr-thumbnail-grid a {
 	padding: 1px;
 	display: block;
+	/* FIXME: Justify instead */
 	margin: 0 20px 20px 0;
 }
 
-#flickr-thumbnail-grid a:hover {
+#flickr-thumbnail-grid a:hover,
+#flickr-thumbnail-grid .current a {
 	border: 1px solid #E5BC39;
 	padding: 0;
 }
 
 hr {
 	height: 4px;
+}
+
+#flickr-main-image img {
+	margin: 0 auto;
+}
+
+#flickr-main-image {
+	text-align: center;
 }
