@@ -65,12 +65,30 @@
     flickrPlugin.utils.extendWithHooks(this);
     this.currentPage = 1;
     this.totalPages = 0;
-    this.itemsPerPage = 8;
+    this.itemsPerPage = 15;
     this.images = [];
     this.lastSeachString = null;
     this.apiKey = apiKey;
     this.currentImage = null;
     this.currentPage = 0;
+  };
+
+  FlickrPluginModel.prototype.nextImage = function() {
+    var index = this.images.indexOf(this.currentImage);
+    if (this.images[index + 1]) {
+      this.currentImage = this.images[index + 1];
+    } else {
+      this.gotoNextPage();
+    }
+  };
+
+  FlickrPluginModel.prototype.previousImage = function(imageId) {
+    var index = this.images.indexOf(this.currentImage);
+    if (this.images[index - 1]) {
+      this.currentImage = this.images[index - 1];
+    } else {
+      this.gotoPreviousPage(true);
+    }
   };
 
   FlickrPluginModel.prototype.getCurrentImage = function(imageId) {
@@ -107,6 +125,13 @@
     return this.totalPages;
   };
 
+  FlickrPluginModel.prototype.gotoPreviousPage = function(_gotoLastImage) {
+    var newPage = this.currentPage - 1;
+    if (newPage > 0) {
+      this.gotoPage(newPage, _gotoLastImage);
+    }
+  };
+
   FlickrPluginModel.prototype.gotoLastPage = function(pageNumber) {
     this.gotoPage(this.totalPages);
   };
@@ -115,10 +140,10 @@
     this.gotoPage(1);
   };
 
-  FlickrPluginModel.prototype.gotoPage = function(pageNumber) {
+  FlickrPluginModel.prototype.gotoPage = function(pageNumber, _gotoLastImage) {
     this.currentPage = pageNumber;
     if (this.lastSeachString) {
-      this.search();
+      this.search(null, _gotoLastImage);
     }
     this.runHook('currentPageChanged', this.currentPage);
   };
@@ -127,28 +152,29 @@
     return this.images;
   };
 
-  FlickrPluginModel.prototype._populate = function(data) {
+  FlickrPluginModel.prototype._populate = function(data, _gotoLastImage) {
     this.images = data.photo.map(function(imageData) {
       return new flickrPlugin.FlickrImageModel(
         imageData
       );
     });
+    var imageIndex = _gotoLastImage ? this.images.length - 1 : 0;
+
     this.totalPages = data.pages;
-    this.setCurrentImage(this.images[0].getId());
+    this.setCurrentImage(this.images[imageIndex].getId());
     this.runHook('currentPageChanged', this.currentPage);
   };
 
-  FlickrPluginModel.prototype.search = function(searchString) {
+  FlickrPluginModel.prototype.search = function(searchString, _gotoLastImage) {
     searchString = searchString || this.lastSeachString;
     if (searchString !== this.lastSeachString) {
-      this.currentPage = 0;
+      this.currentPage = 1;
     }
 
     // FIXME: Add currentPage
     var self = this;
     var url = [
       'http://api.flickr.com/services/rest/?format=json',
-      'sort=random',
       'method=flickr.photos.search',
       'tags=' + encodeURIComponent(searchString),
       'tag_mode=all',
@@ -166,7 +192,7 @@
           .replace(/^[^\(]+\(/, '')
           .replace(/\)[^\)]*$/, '')
       );
-      self._populate(json.photos);
+      self._populate(json.photos, _gotoLastImage);
     };
 
     xhr.send();
@@ -195,31 +221,51 @@
     var firstPage = Math.max(1, currentPage - this.radius);
     var lastPage = Math.min(totalPages, currentPage + this.radius);
 
-    var start = document.createElement('span');
-    var end = document.createElement('span');
-
+    var start = document.createElement('a');
+    start.href = '#';
     start.appendChild(
        document.createTextNode('<<')
     );
     start.classList.add('start');
+    start.onclick = function() {
+      self.model.gotoFirstPage();
+      return false;
+    };
     root.appendChild(start);
 
     for (var i = firstPage; i <= lastPage; i++) {
-      var number = document.createElement('span');
+      var number = document.createElement('a');
+      var self = this;
+      number.href = '#';
+
       number.appendChild(
         document.createTextNode(i)
       );
       if (i == currentPage) {
         number.classList.add('current');
       }
-      number.setAttribute('data-number', i);
+
+      // FIXME: Move outside
+      (function(id) {
+        number.onclick = function() {
+          self.model.gotoPage(id);
+          return false;
+        };
+      } (i));
+
       root.appendChild(number);
     }
 
+    var end = document.createElement('a');
+    end.href = '#';
     end.appendChild(
       document.createTextNode('>>')
     );
     end.classList.add('end');
+    end.onclick = function() {
+      self.model.gotoLastPage();
+      return false;
+    };
     root.appendChild(end);
   };
 
@@ -230,6 +276,7 @@
   ) {
     this.model = model;
     model.addHook('currentPageChanged', this._render, this);
+    model.addHook('currentImageChanged', this._render, this);
     this.domRoot = domElement;
     this.model = model;
   };
@@ -238,11 +285,16 @@
     var images = this.model.getImages();
     var root = this.domRoot;
     utils.removeAllChildren(root);
+    var self = this;
 
     images.forEach(function(imageObject) {
       var imageContainer = document.createElement('div');
-      var self = this;
+      if (imageObject === self.model.getCurrentImage()) {
+        imageContainer.classList.add('current');
+      }
       var imageLink = document.createElement('a');
+      var id = imageObject.getId();
+
       imageLink.href = '#';
 
       (function(id) {
@@ -250,7 +302,7 @@
           self.model.setCurrentImage(id);
           return false;
         };
-      }(imageObject.getId()));
+      }(id));
 
       imageContainer.appendChild(imageLink);
 
@@ -307,6 +359,7 @@
     this.grid = new FlickrPluginGridView(gridDom, model);
     this.image = new FlickrImageView(mainImageDom, model);
     this.search = new FlickrSearchView(searchDom, model);
+    model.search('test');
   };
 
 }());

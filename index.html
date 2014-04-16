@@ -8,19 +8,21 @@
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <form id="flickr-form">
-      <div>
-        <input id="flickr-search" type="search"/>
-      </div>
-    </form>
 
-    <div id="main-image"></div>
-    <div id="flickr-thumbnail-grid"></div>
-    <div id="pager"></div>
+    <div class="container">
+      <form id="flickr-form">
+        <div>
+          <input id="flickr-search" type="search"/>
+        </div>
+      </form>
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="main.js"></script>
-    <script>
+      <div id="main-image"></div>
+      <div id="flickr-thumbnail-grid"></div>
+      <div id="flickr-pager"></div>
+
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+      <script src="main.js"></script>
+      <script>
 
 document.getElementById('flickr-form').onsubmit = function() {
   return false;
@@ -29,12 +31,13 @@ document.getElementById('flickr-form').onsubmit = function() {
 initFlickrPlugin(
   '3ed0a4d16d372c4464a49ada6d6212b0',
   document.getElementById('main-image'),
-  document.getElementById('pager'),
+  document.getElementById('flickr-pager'),
   document.getElementById('flickr-thumbnail-grid'),
   document.getElementById('flickr-search')
 );
 
-    </script>
-    <script src="http://localhost:8080/skewer"></script>
+      </script>
+      <script src="http://localhost:8080/skewer"></script>
+    </div>
   </body>
 </html>
