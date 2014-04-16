@@ -73,6 +73,8 @@ hr {
 	border-width: 0 0 4px 0;
 	border-color: white;
 	border-style: solid;
+	clear: both;
+	margin: 15px 0;
 }
 
 #flickr-main-image {
@@ -112,4 +114,47 @@ hr {
 
 #flickr-pager {
 	text-align: right;
+}
+
+.share {
+	float: right;
+	background: #650700;
+	display: inline-block;
+	width: 50px;
+	text-align: center;
+	/* padding: 5px; */
+}
+
+.share .share-content-container {
+	display: none;
+	margin-top: -120px;
+	margin-left: -150px;
+	float: right;
+	width: 150px;
+	height: 110px;
+	position: relative;
+	padding-bottom: 10px;
+}
+
+.share-content-bg:after {
+	content: '';
+	position: absolute;
+	bottom: 0px;
+	right: 25px;
+	-webkit-transform:rotate(45deg);
+	transform:rotate(45deg);
+	width: 20px;
+	height: 20px;
+	background: #650700;
+	display: block;
+}
+
+.share-content-bg {
+	background: #650700;
+	height: 100%;
+}
+
+.share:hover .share-content-container,
+.share .share-content-container:hover {
+	display: block;
 }
