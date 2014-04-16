@@ -3,16 +3,16 @@
 
   var utils = flickrPlugin.utils = {
     runHook: function(hookName) {
-      var args = Array.prototype.slice.apply(arguments, 1);
+      var args = Array.prototype.slice.call(arguments, 1);
       var hooks = this.hooks[hookName] || [];
       hooks.forEach(function(hook) {
-        hook[1].apply(hook[0], args);
+        hook[0].apply(hook[1], args);
       });
     },
 
     addHook: function(hookName, handler, object) {
       var hook = this.hooks[hookName] = this.hooks[hookName] || [];
-      hook.push([object, handler]);
+      hook.push([handler, object]);
     },
 
     extendWithHooks: function(object) {
@@ -65,12 +65,16 @@
     flickrPlugin.utils.extendWithHooks(this);
     this.currentPage = 0;
     this.totalPages = 0;
-    this.itemsPerPage = 6;
+    this.itemsPerPage = 8;
     this.images = [];
     this.lastSeachString = null;
     this.apiKey = apiKey;
     this.currentImage = null;
     this.currentPage = 0;
+  };
+
+  FlickrPluginModel.prototype.getCurrentImage = function(imageId) {
+    return this.currentImage;
   };
 
   FlickrPluginModel.prototype.getImage = function(imageId) {
@@ -88,6 +92,7 @@
     if ( ! image) {
       return;
     }
+    this.currentImage = image;
     this.runHook('currentImageChanged', image);
   };
 
@@ -115,19 +120,18 @@
     this.runHook('currentPageChanged', this.currentPage);
   };
 
-  FlickrPluginModel.prototype.gotoPage = function(pageNumber) {
-    this.currentPage = pageNumber;
-    if (this.lastSeachString) {
-      this.search();
-    }
+  FlickrPluginModel.prototype.getImages = function() {
+    return this.images;
   };
 
   FlickrPluginModel.prototype._populate = function(data) {
-    this.images = data.photo.map(function(imageData) {
+    this.images = data.photos.photo.map(function(imageData) {
       return new flickrPlugin.FlickrImageModel(
         imageData
       );
     });
+    this.setCurrentImage(this.images[0].getId);
+    this.runHook('currentPageChanged', this.currentPage);
   };
 
   FlickrPluginModel.prototype.search = function(searchString) {
@@ -169,13 +173,15 @@
   var FlickrPluginPagerView = flickrPlugin.FlickrPluginPagerView = function(
     domElement, model
   ) {
-    flickrPlugin.addHook('totalPagesChanged', this._render, this);
-    flickrPlugin.addHook('currentPageChanged', this._render, this);
+    this.model = model;
+    model.addHook('totalPagesChanged', this._render, this);
+    model.addHook('currentPageChanged', this._render, this);
     this.domRoot = domElement;
     this.radius = 5;
   };
 
   FlickrPluginPagerView.prototype._render = function() {
+    console.log('_render ran');
     var root = this.domRoot;
     utils.removeAllChildren(root);
     var totalPages = this.model.getTotalPages();
@@ -214,7 +220,8 @@
   var FlickrPluginGridView = flickrPlugin.FlickrPluginGridView = function(
     domElement, model
   ) {
-    flickrPlugin.addHook('currentPageChanged', this.setTotalPages, this);
+    this.model = model;
+    model.addHook('currentPageChanged', this._render, this);
     this.domRoot = domElement;
     this.model = model;
   };
@@ -232,7 +239,8 @@
 
       (function(id) {
         imageLink.onclick = function() {
-          self.setCurrentImage(id);
+          self.model.setCurrentImage(id);
+          return false;
         };
       }(imageObject.getId()));
 
@@ -240,17 +248,56 @@
 
       var image = document.createElement('img');
       imageLink.appendChild(image);
-      image.src = imageObject.getImage();
+      image.src = imageObject.getThumbnail();
 
       root.appendChild(imageContainer);
     });
   };
 
-  window.initFlickrPlugin = function(mainImageDom, pagerDom, gridDom) {
-    var model = new FlickrPluginModel('3ed0a4d16d372c4464a49ada6d6212b0');
-    var pager = new FlickrPluginPagerView(pagerDom, model);
-    var grid = new FlickrPluginGridView(gridDom, model);
+  // ---------------------------------------------------------------------------
 
+  var FlickrImageView = function(
+    domElement, model
+  ) {
+    this.model = model;
+    model.addHook('currentPageChanged', this._render, this);
+    this.domRoot = domElement;
+    this.model = model;
+  };
+
+  FlickrImageView.prototype._render = function() {
+    var root = this.domRoot;
+    utils.removeAllChildren(root);
+
+    var image = document.createElement('img');
+    root.appendChild(image);
+    image.src = this.model
+      .getCurrentImage()
+      .getImage();
+
+  };
+
+  // ---------------------------------------------------------------------------
+
+  var FlickrSearchView = function(
+    domElement, model
+  ) {
+    this.domRoot = domElement;
+    this.model = model;
+    domElement.onchange = function() {
+      console.log('search ran');
+      model.search(this.value);
+    };
+  };
+
+  // ---------------------------------------------------------------------------
+
+  window.initFlickrPlugin = function(apiKey, mainImageDom, pagerDom, gridDom, searchDom) {
+    var model = this.model = new FlickrPluginModel(apiKey);
+    this.pager = new FlickrPluginPagerView(pagerDom, model);
+    this.grid = new FlickrPluginGridView(gridDom, model);
+    this.image = new FlickrImageView(mainImageDom, model);
+    this.search = new FlickrSearchView(searchDom, model);
   };
 
 }());
