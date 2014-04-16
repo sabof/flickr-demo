@@ -80,7 +80,10 @@
   FlickrPluginModel.prototype.getImage = function(imageId) {
     var result,
         found = this.images.some(function(image) {
-          return (result = image.getId() == imageId);
+          if (image.getId() == imageId) {
+            result = image;
+            return image;
+          }
         });
     if (found) {
       return result;
@@ -260,7 +263,7 @@
     domElement, model
   ) {
     this.model = model;
-    model.addHook('currentPageChanged', this._render, this);
+    model.addHook('currentImageChanged', this._render, this);
     this.domRoot = domElement;
     this.model = model;
   };
