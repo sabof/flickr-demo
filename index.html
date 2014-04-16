@@ -42,6 +42,10 @@
       <script>
 
 document.getElementById('flickr-form').onsubmit = function() {
+  var val = document.getElementById('flickr-search').value;
+  if (val) {
+    model.search(val);
+  }
   return false;
 };
 

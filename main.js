@@ -28,7 +28,6 @@
 
     preloadImages: function(images, callback) {
       var counter = images.length;
-
       function onComplete() {
         if ( ! --counter ) {
           callback();
@@ -42,6 +41,7 @@
         imgObj.src = url;
       });
     }
+
   };
 
   // ---------------------------------------------------------------------------
@@ -431,28 +431,14 @@
 
  };
 
- // ---------------------------------------------------------------------------
-
- var FlickrSearchView = function(
-   domElement, model
- ) {
-   this.domRoot = domElement;
-   this.model = model;
-   domElement.onchange = function() {
-     console.log('search ran');
-      model.search(this.value);
-    };
-  };
-
   // ---------------------------------------------------------------------------
 
-  window.initFlickrPlugin = function(apiKey, mainImageDom, pagerDom, gridDom, searchDom) {
+  window.initFlickrPlugin = function(apiKey, mainImageDom, pagerDom, gridDom) {
     var model = new FlickrPluginModel(apiKey);
     var pager = new FlickrPluginPagerView(pagerDom, model);
     var grid = new FlickrPluginGridView(gridDom, model);
     var image = new FlickrImageView(mainImageDom, model);
-    var search = new FlickrSearchView(searchDom, model);
-    model.search('test');
+    model.search('test card');
     return model;
   };
 
