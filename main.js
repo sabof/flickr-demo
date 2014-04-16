@@ -1,7 +1,6 @@
 (function() {
-  var flickrPlugin = {};
 
-  var utils = flickrPlugin.utils = {
+  var utils = {
     runHook: function(hookName) {
       var args = Array.prototype.slice.call(arguments, 1);
       var hooks = this.hooks[hookName] || [];
@@ -30,7 +29,7 @@
 
   // ---------------------------------------------------------------------------
 
-  var FlickrImageModel = flickrPlugin.FlickrImageModel = function(
+  var FlickrImageModel = function(
     data
   ) {
     this.data = data;
@@ -59,10 +58,10 @@
 
   // ---------------------------------------------------------------------------
 
-  var FlickrPluginModel = flickrPlugin.FlickrPluginModel = function(
+  var FlickrPluginModel = function(
     apiKey
   ) {
-    flickrPlugin.utils.extendWithHooks(this);
+    utils.extendWithHooks(this);
     this.currentPage = 1;
     this.totalPages = 0;
     this.itemsPerPage = 15;
@@ -77,6 +76,7 @@
     var index = this.images.indexOf(this.currentImage);
     if (this.images[index + 1]) {
       this.currentImage = this.images[index + 1];
+      this.runHook('currentImageChanged', this.currentImage);
     } else {
       this.gotoNextPage();
     }
@@ -86,6 +86,7 @@
     var index = this.images.indexOf(this.currentImage);
     if (this.images[index - 1]) {
       this.currentImage = this.images[index - 1];
+      this.runHook('currentImageChanged', this.currentImage);
     } else {
       this.gotoPreviousPage(true);
     }
@@ -132,6 +133,13 @@
     }
   };
 
+  FlickrPluginModel.prototype.gotoNextPage = function(_gotoLastImage) {
+    var newPage = this.currentPage + 1;
+    if (newPage <= this.totalPages) {
+      this.gotoPage(newPage);
+    }
+  };
+
   FlickrPluginModel.prototype.gotoLastPage = function(pageNumber) {
     this.gotoPage(this.totalPages);
   };
@@ -154,7 +162,7 @@
 
   FlickrPluginModel.prototype._populate = function(data, _gotoLastImage) {
     this.images = data.photo.map(function(imageData) {
-      return new flickrPlugin.FlickrImageModel(
+      return new FlickrImageModel(
         imageData
       );
     });
@@ -201,7 +209,7 @@
 
   // ---------------------------------------------------------------------------
 
-  var FlickrPluginPagerView = flickrPlugin.FlickrPluginPagerView = function(
+  var FlickrPluginPagerView = function(
     domElement, model
   ) {
     this.model = model;
@@ -233,6 +241,18 @@
     };
     root.appendChild(start);
 
+    var previous = document.createElement('a');
+    previous.href = '#';
+    previous.appendChild(
+       document.createTextNode('<')
+    );
+    previous.classList.add('previous');
+    previous.onclick = function() {
+      self.model.gotoPreviousPage();
+      return false;
+    };
+    root.appendChild(previous);
+
     for (var i = firstPage; i <= lastPage; i++) {
       var number = document.createElement('a');
       var self = this;
@@ -256,6 +276,18 @@
       root.appendChild(number);
     }
 
+    var next = document.createElement('a');
+    next.href = '#';
+    next.appendChild(
+      document.createTextNode('>')
+    );
+    next.classList.add('next');
+    next.onclick = function() {
+      self.model.gotoNextPage();
+      return false;
+    };
+    root.appendChild(next);
+
     var end = document.createElement('a');
     end.href = '#';
     end.appendChild(
@@ -267,11 +299,12 @@
       return false;
     };
     root.appendChild(end);
+
   };
 
   // ---------------------------------------------------------------------------
 
-  var FlickrPluginGridView = flickrPlugin.FlickrPluginGridView = function(
+  var FlickrPluginGridView = function(
     domElement, model
   ) {
     this.model = model;
@@ -385,12 +418,13 @@
   // ---------------------------------------------------------------------------
 
   window.initFlickrPlugin = function(apiKey, mainImageDom, pagerDom, gridDom, searchDom) {
-    var model = this.model = new FlickrPluginModel(apiKey);
-    this.pager = new FlickrPluginPagerView(pagerDom, model);
-    this.grid = new FlickrPluginGridView(gridDom, model);
-    this.image = new FlickrImageView(mainImageDom, model);
-    this.search = new FlickrSearchView(searchDom, model);
+    var model = new FlickrPluginModel(apiKey);
+    var pager = new FlickrPluginPagerView(pagerDom, model);
+    var grid = new FlickrPluginGridView(gridDom, model);
+    var image = new FlickrImageView(mainImageDom, model);
+    var search = new FlickrSearchView(searchDom, model);
     model.search('test');
+    return model;
   };
 
 }());

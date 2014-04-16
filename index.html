@@ -11,7 +11,9 @@
     <div class="container">
       <form id="flickr-form">
         <div>
-          <input id="flickr-search" type="search"/>
+          <input id="flickr-search"
+                 placeholder="Search"
+                 type="search"/>
         </div>
       </form>
       <h1>Photos</h1>
@@ -19,6 +21,8 @@
     <div class="maroon-background"></div>
     <div class="container">
       <div id="flickr-main-image"></div>
+      <a href="#" id="flickr-previous-image">Previous</a>
+      <a href="#" id="flickr-next-image">Next </a>
       <hr />
 
       <div id="flickr-thumbnail-grid"></div>
@@ -33,7 +37,7 @@ document.getElementById('flickr-form').onsubmit = function() {
   return false;
 };
 
-initFlickrPlugin(
+var model = initFlickrPlugin(
   '3ed0a4d16d372c4464a49ada6d6212b0',
   document.getElementById('flickr-main-image'),
   document.getElementById('flickr-pager'),
@@ -41,6 +45,15 @@ initFlickrPlugin(
   document.getElementById('flickr-search')
 );
 
+document.getElementById('flickr-next-image').onclick = function () {
+  model.nextImage();
+  return false;
+}
+
+document.getElementById('flickr-previous-image').onclick = function () {
+  model.previousImage();
+  return false;
+}
       </script>
       <script src="http://localhost:8080/skewer"></script>
     </div>
