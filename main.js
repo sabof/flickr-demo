@@ -63,7 +63,7 @@
     apiKey
   ) {
     flickrPlugin.utils.extendWithHooks(this);
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.totalPages = 0;
     this.itemsPerPage = 8;
     this.images = [];
@@ -128,12 +128,13 @@
   };
 
   FlickrPluginModel.prototype._populate = function(data) {
-    this.images = data.photos.photo.map(function(imageData) {
+    this.images = data.photo.map(function(imageData) {
       return new flickrPlugin.FlickrImageModel(
         imageData
       );
     });
-    this.setCurrentImage(this.images[0].getId);
+    this.totalPages = data.pages;
+    this.setCurrentImage(this.images[0].getId());
     this.runHook('currentPageChanged', this.currentPage);
   };
 
@@ -153,6 +154,7 @@
       'tag_mode=all',
       'per_page=' + this.itemsPerPage,
       'api_key=' + this.apiKey,
+      'page=' + this.currentPage
     ].join('&');
 
     var xhr = new XMLHttpRequest();
@@ -164,7 +166,7 @@
           .replace(/^[^\(]+\(/, '')
           .replace(/\)[^\)]*$/, '')
       );
-      self._populate(json);
+      self._populate(json.photos);
     };
 
     xhr.send();
@@ -207,12 +209,15 @@
       number.appendChild(
         document.createTextNode(i)
       );
+      if (i == currentPage) {
+        number.classList.add('current');
+      }
       number.setAttribute('data-number', i);
       root.appendChild(number);
     }
 
     end.appendChild(
-       document.createTextNode('>>')
+      document.createTextNode('>>')
     );
     end.classList.add('end');
     root.appendChild(end);
@@ -269,6 +274,7 @@
   };
 
   FlickrImageView.prototype._render = function() {
+    console.log('main_imageRender');
     var root = this.domRoot;
     utils.removeAllChildren(root);
 

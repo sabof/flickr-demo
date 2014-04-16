@@ -1,3 +1,7 @@
 .flickr-container {
 
 }
+
+#flickr-thumbnail-grid div {
+	display: inline-block;
+}
