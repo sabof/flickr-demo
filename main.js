@@ -52,6 +52,10 @@
     this.data = data;
   };
 
+  FlickrImageModel.prototype.getTitle = function() {
+    return this.data.title;
+  };
+
   FlickrImageModel.prototype.getId = function() {
     return this.data.id;
   };
@@ -66,7 +70,6 @@
 
   FlickrImageModel.prototype.getThumbnail = function(pageNumber) {
     var d = this.data;
-    // (format "http://farm%s.staticflickr.com/%s/%s_%s_z.jpg" farm server id secret)
     return "http://farm" + d.farm + ".staticflickr.com/" +
       d.server + "/" +
       d.id + "_" +
@@ -237,7 +240,6 @@
   };
 
   FlickrPluginPagerView.prototype._render = function() {
-    console.log('_render ran');
     var root = this.domRoot;
     utils.removeAllChildren(root);
     var totalPages = this.model.getTotalPages();
@@ -274,7 +276,6 @@
       var number = document.createElement('a');
       var self = this;
       number.href = '#';
-
       number.appendChild(
         document.createTextNode(i)
       );
@@ -282,10 +283,9 @@
         number.classList.add('current');
       }
 
-      // FIXME: Move outside
-      (function(id) {
+      (function(pageNumber) {
         number.onclick = function() {
-          self.model.gotoPage(id);
+          self.model.gotoPage(pageNumber);
           return false;
         };
       } (i));
@@ -443,3 +443,11 @@
   };
 
 }());
+
+// FIXME: Remove non-functional pager arrows
+// FIXME: Main image arrows
+// FIXME: Share button image
+// FIXME: Search button
+// FIXME: Move onClick handlers
+
+// FIXED: Main image title

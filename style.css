@@ -136,6 +136,7 @@ hr {
 }
 
 .share-content-bg {
+	padding: 10px 10px 0;
 	background: #650700;
 	position: relative;
 	height: 100px;
@@ -156,4 +157,8 @@ hr {
 
 .share:hover .share-content-container {
 	display: block;
+}
+
+#flickr-title {
+	text-align: center;
 }

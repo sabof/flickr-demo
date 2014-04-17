@@ -21,6 +21,7 @@
     <div class="maroon-background"></div>
     <div class="container">
       <div id="flickr-main-image"></div>
+      <div id="flickr-title"></div>
       <a href="#" id="flickr-previous-image">Previous</a>
       <a href="#" id="flickr-next-image">Next </a>
       <div class="share">
@@ -41,6 +42,20 @@
       <script src="main.js"></script>
       <script>
 
+var model = initFlickrPlugin(
+  '3ed0a4d16d372c4464a49ada6d6212b0',
+  document.getElementById('flickr-main-image'),
+  document.getElementById('flickr-pager'),
+  document.getElementById('flickr-thumbnail-grid')
+);
+
+model.addHook(
+  'currentImageChanged',
+  function(image) {
+    document.getElementById('flickr-title').innerHTML = image.getTitle();
+  }
+);
+
 document.getElementById('flickr-form').onsubmit = function() {
   var val = document.getElementById('flickr-search').value;
   if (val) {
@@ -48,14 +63,6 @@ document.getElementById('flickr-form').onsubmit = function() {
   }
   return false;
 };
-
-var model = initFlickrPlugin(
-  '3ed0a4d16d372c4464a49ada6d6212b0',
-  document.getElementById('flickr-main-image'),
-  document.getElementById('flickr-pager'),
-  document.getElementById('flickr-thumbnail-grid'),
-  document.getElementById('flickr-search')
-);
 
 document.getElementById('flickr-next-image').onclick = function () {
   model.nextImage();
@@ -66,6 +73,7 @@ document.getElementById('flickr-previous-image').onclick = function () {
   model.previousImage();
   return false;
 }
+
       </script>
       <script src="http://localhost:8080/skewer"></script>
     </div>
