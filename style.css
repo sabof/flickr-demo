@@ -131,17 +131,22 @@ hr {
 	margin-left: -150px;
 	float: right;
 	width: 150px;
-	height: 110px;
+	height: 120px;
 	position: relative;
-	padding-bottom: 10px;
+}
+
+.share-content-bg {
+	background: #650700;
+	position: relative;
+	height: 100px;
 }
 
 .share-content-bg:after {
 	content: '';
 	position: absolute;
-	bottom: 0px;
+	bottom: -7px;
 	right: 25px;
-	-webkit-transform:rotate(45deg);
+	-webkit-transform: rotate(45deg);
 	transform:rotate(45deg);
 	width: 20px;
 	height: 20px;
@@ -149,12 +154,6 @@ hr {
 	display: block;
 }
 
-.share-content-bg {
-	background: #650700;
-	height: 100%;
-}
-
-.share:hover .share-content-container,
-.share .share-content-container:hover {
+.share:hover .share-content-container {
 	display: block;
 }
