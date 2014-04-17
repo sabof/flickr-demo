@@ -373,7 +373,6 @@
       imageLink.href = '#';
       imageLink.setAttribute('data-id', id);
 
-      // FIXME: Move outside
       (function(id) {
         imageLink.onclick = function() {
           self.model.setCurrentImage(id);

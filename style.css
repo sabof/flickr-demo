@@ -116,13 +116,19 @@ hr {
 	text-align: right;
 }
 
+/* 57 x 34 */
 .share {
 	float: right;
-	background: #650700;
+	background: url('images/share.png');
 	display: inline-block;
-	width: 50px;
+	width: 57px;
+	height: 34px;
 	text-align: center;
 	/* padding: 5px; */
+}
+
+.share:hover {
+	background: url('images/share-over.png');
 }
 
 .share .share-content-container {
@@ -161,4 +167,35 @@ hr {
 
 #flickr-title {
 	text-align: center;
+}
+
+#flickr-main-image-container {
+	position: relative;
+}
+
+#flickr-previous-image,
+#flickr-next-image {
+	position: absolute;
+	top: 205px;
+	width: 58px;
+	height: 58px;
+	display: inline-block;
+}
+
+#flickr-previous-image {
+	left: 0;
+	background: url('images/left.png');
+}
+
+#flickr-previous-image:hover {
+	background: url('images/left-over.png');
+}
+
+#flickr-next-image {
+	right: 0;
+	background: url('images/right.png');
+}
+
+#flickr-next-image:hover {
+	background: url('images/right-over.png');
 }
