@@ -2,9 +2,7 @@
 <html lang="en-gb" >
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <title></title>
-    <link href="http://yui.yahooapis.com/3.10.1/build/cssreset/cssreset-min.css"
-          rel="stylesheet" type="text/css" />
+    <title>Photos</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
@@ -39,41 +37,53 @@
       <hr />
 
       <script src="main.js"></script>
+
       <script>
+(function() {
+  var model = new flickrPlugin.FlickrPluginModel('3ed0a4d16d372c4464a49ada6d6212b0');
 
-var model = initFlickrPlugin(
-  '3ed0a4d16d372c4464a49ada6d6212b0',
-  document.getElementById('flickr-main-image'),
-  document.getElementById('flickr-pager'),
-  document.getElementById('flickr-thumbnail-grid')
-);
+  var pager = new flickrPlugin.FlickrPluginPagerView(
+    document.getElementById('flickr-pager'),
+    model
+  );
 
-model.addHook(
-  'currentImageChanged',
-  function(image) {
-    document.getElementById('flickr-title').innerHTML = image.getTitle();
+  var grid = new flickrPlugin.FlickrPluginGridView(
+    document.getElementById('flickr-thumbnail-grid'),
+    model
+  );
+
+  var image = new flickrPlugin.FlickrImageView(
+    document.getElementById('flickr-main-image'),
+    model
+  );
+
+  model.addHook(
+    'currentImageChanged',
+    function(image) {
+      document.getElementById('flickr-title').innerHTML = image.getTitle();
+    }
+  );
+
+  document.getElementById('flickr-form').onsubmit = function() {
+    var val = document.getElementById('flickr-search').value;
+    if (val) {
+      model.search(val);
+    }
+    return false;
+  };
+
+  document.getElementById('flickr-next-image').onclick = function () {
+    model.nextImage();
+    return false;
   }
-);
 
-document.getElementById('flickr-form').onsubmit = function() {
-  var val = document.getElementById('flickr-search').value;
-  if (val) {
-    model.search(val);
+  document.getElementById('flickr-previous-image').onclick = function () {
+    model.previousImage();
+    return false;
   }
-  return false;
-};
-
-document.getElementById('flickr-next-image').onclick = function () {
-  model.nextImage();
-  return false;
-}
-
-document.getElementById('flickr-previous-image').onclick = function () {
-  model.previousImage();
-  return false;
-}
-
-      </script>
+  model.search('test card');
+} ());
+</script>
       <script src="http://localhost:8080/skewer"></script>
     </div>
   </body>

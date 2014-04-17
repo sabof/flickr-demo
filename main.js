@@ -359,7 +359,6 @@
   };
 
   FlickrPluginGridView.prototype._render = function() {
-    console.log('gridRender');
     var images = this.model.getImages();
     var root = this.domRoot;
     utils.removeAllChildren(root);
@@ -410,15 +409,12 @@
   };
 
   FlickrImageView.prototype._scheduleRender = function() {
-    var img = new Image();
     var self = this;
-    img.onload = function() {
+    utils.preloadImages([
+      this.model.getCurrentImage().getImage()
+    ], function() {
       self._render();
-    };
-
-    img.src = this.model
-      .getCurrentImage()
-      .getImage();
+    });
   };
 
  FlickrImageView.prototype._render = function() {
@@ -433,15 +429,11 @@
 
  };
 
-  // ---------------------------------------------------------------------------
-
-  window.initFlickrPlugin = function(apiKey, mainImageDom, pagerDom, gridDom) {
-    var model = new FlickrPluginModel(apiKey);
-    var pager = new FlickrPluginPagerView(pagerDom, model);
-    var grid = new FlickrPluginGridView(gridDom, model);
-    var image = new FlickrImageView(mainImageDom, model);
-    model.search('test card');
-    return model;
+  window.flickrPlugin = {
+    FlickrPluginModel: FlickrPluginModel,
+    FlickrPluginPagerView: FlickrPluginPagerView,
+    FlickrPluginGridView: FlickrPluginGridView,
+    FlickrImageView: FlickrImageView
   };
 
 }());
