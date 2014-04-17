@@ -248,29 +248,31 @@
     var firstPage = Math.max(1, currentPage - this.radius);
     var lastPage = Math.min(totalPages, currentPage + this.radius);
 
-    var start = document.createElement('a');
-    start.href = '#';
-    start.appendChild(
-       document.createTextNode('<<')
-    );
-    start.classList.add('start');
-    start.onclick = function() {
-      self.model.gotoFirstPage();
-      return false;
-    };
-    root.appendChild(start);
+    if (currentPage !== 1) {
+      var start = document.createElement('a');
+      start.href = '#';
+      start.appendChild(
+        document.createTextNode('<<')
+      );
+      start.classList.add('start');
+      start.onclick = function() {
+        self.model.gotoFirstPage();
+        return false;
+      };
+      root.appendChild(start);
 
-    var previous = document.createElement('a');
-    previous.href = '#';
-    previous.appendChild(
-       document.createTextNode('<')
-    );
-    previous.classList.add('previous');
-    previous.onclick = function() {
-      self.model.gotoPreviousPage();
-      return false;
-    };
-    root.appendChild(previous);
+      var previous = document.createElement('a');
+      previous.href = '#';
+      previous.appendChild(
+        document.createTextNode('<')
+      );
+      previous.classList.add('previous');
+      previous.onclick = function() {
+        self.model.gotoPreviousPage();
+        return false;
+      };
+      root.appendChild(previous);
+    }
 
     for (var i = firstPage; i <= lastPage; i++) {
       var number = document.createElement('a');
@@ -293,30 +295,31 @@
       root.appendChild(number);
     }
 
-    var next = document.createElement('a');
-    next.href = '#';
-    next.appendChild(
-      document.createTextNode('>')
-    );
-    next.classList.add('next');
-    next.onclick = function() {
-      self.model.gotoNextPage();
-      return false;
-    };
-    root.appendChild(next);
+    if (currentPage !== totalPages) {
+      var next = document.createElement('a');
+      next.href = '#';
+      next.appendChild(
+        document.createTextNode('>')
+      );
+      next.classList.add('next');
+      next.onclick = function() {
+        self.model.gotoNextPage();
+        return false;
+      };
+      root.appendChild(next);
 
-    var end = document.createElement('a');
-    end.href = '#';
-    end.appendChild(
-      document.createTextNode('>>')
-    );
-    end.classList.add('end');
-    end.onclick = function() {
-      self.model.gotoLastPage();
-      return false;
-    };
-    root.appendChild(end);
-
+      var end = document.createElement('a');
+      end.href = '#';
+      end.appendChild(
+        document.createTextNode('>>')
+      );
+      end.classList.add('end');
+      end.onclick = function() {
+        self.model.gotoLastPage();
+        return false;
+      };
+      root.appendChild(end);
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -443,10 +446,8 @@
 
 }());
 
-// FIXME: Remove non-functional pager arrows
-// FIXME: Main image arrows
-// FIXME: Share button image
-// FIXME: Search button
-// FIXME: Move onClick handlers
-
+// FIXED: Remove non-functional pager arrows
+// FIXED: Main image arrows
+// FIXED: Share button image
+// FIXED: Search button
 // FIXED: Main image title

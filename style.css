@@ -101,9 +101,37 @@ hr {
 	width: 100%;
 }
 
-#flickr-search {
+#flickr-form {
+	text-align: right;
 	margin: 20px 0;
 	float: right;
+}
+
+#flickr-form input {
+	vertical-align: top;
+}
+
+#flickr-search {
+	width: 340px;
+	/* float: right; */
+	padding: 0 5px;
+	border: solid #650700;
+	border-width: 1px 0 1px 1px;
+	background-origin: content-box;
+	height: 28px;
+	box-sizing: border-box;
+}
+
+#flickr-search-button {
+	background: url('images/search.png') white;
+	background-repeat: no-repeat;
+	background-position: center center;
+	padding: 0 5px;
+	border: solid #650700;
+	height: 28px;
+	width: 28px;
+	border-width: 1px 1px 1px 0;
+	box-sizing: border-box;
 }
 
 .maroon-background {
@@ -166,6 +194,7 @@ hr {
 }
 
 #flickr-title {
+	margin: 10px 0;
 	text-align: center;
 }
 
@@ -198,4 +227,8 @@ hr {
 
 #flickr-next-image:hover {
 	background: url('images/right-over.png');
+}
+
+#logo {
+	margin: 15px 0;
 }
