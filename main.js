@@ -1,5 +1,4 @@
 (function() {
-
   var utils = {
     runHook: function(hookName) {
       var args = Array.prototype.slice.call(arguments, 1);
@@ -78,9 +77,7 @@
 
   // ---------------------------------------------------------------------------
 
-  var FlickrPluginModel = function(
-    apiKey
-  ) {
+  var FlickrPluginModel = function(apiKey) {
     utils.extendWithHooks(this);
     this.currentPage = 1;
     this.totalPages = 0;
@@ -89,7 +86,6 @@
     this.lastSeachString = null;
     this.apiKey = apiKey;
     this.currentImage = null;
-    this.currentPage = 0;
   };
 
   FlickrPluginModel.prototype.nextImage = function() {
@@ -112,10 +108,6 @@
     }
   };
 
-  FlickrPluginModel.prototype.getCurrentImage = function(imageId) {
-    return this.currentImage;
-  };
-
   FlickrPluginModel.prototype.getImage = function(imageId) {
     var result,
         found = this.images.some(function(image) {
@@ -136,6 +128,10 @@
     }
     this.currentImage = image;
     this.runHook('currentImageChanged', image);
+  };
+
+  FlickrPluginModel.prototype.getCurrentImage = function(imageId) {
+    return this.currentImage;
   };
 
   FlickrPluginModel.prototype.getCurrentPage = function() {
@@ -395,7 +391,6 @@
       );
     });
   };
-
 
   // ---------------------------------------------------------------------------
 
