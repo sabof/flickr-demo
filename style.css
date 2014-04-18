@@ -6,6 +6,8 @@ html {
 
 body {
 	background: #050B14;
+	margin: 0;
+	padding: 0;
 	margin-bottom: 150px;
 	padding-bottom: 50px;
 }
